@@ -20,10 +20,6 @@ app.use(cors({
     credentials: true,
 }));
 
-app.get('/', (req, res) => {
-    res.send('Hello, World!');
-});
-
 app.use('/auth', authRoutes);
 app.use('/messages', messageRoutes);
 
