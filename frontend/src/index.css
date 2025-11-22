@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@layer utilities {
+  @keyframes pulse-custom {
+
+    0%,
+    100% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: .4;
+    }
+  }
+
+  .pulse {
+    animation: pulse-custom 1.5s ease-in-out infinite;
+  }
+}
