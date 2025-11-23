@@ -43,7 +43,6 @@ export const signup = async (req, res) => {
                 profilePic: newUser.profilePic,
                 password: newUser.password,
                 message: "User created successfully"
-
             });
         }
         else {
@@ -72,20 +71,22 @@ export const login = async (req, res) => {
         else {
             generateToken(user._id, res);
             res.status(200).json({
-                _id: user._id,
-                email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                profilePic: user.profilePic,
-                password: user.password,
+                user: {
+                    _id: user._id,
+                    email: user.email,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    profilePic: user.profilePic,
+                    password: user.password
+                },
+
                 message: "Login successful"
             });
-
+            console.log("Login successful for user:", user);
         }
     } catch (error) {
         res.status(500).json({ message: "Error in login" });
     }
-
 };
 
 export const logout = async (req, res) => {
@@ -142,7 +143,7 @@ export const updateProfile = async (req, res) => {
 
 export const checkRoute = async (req, res) => {
     try {
-        res.status(200).json( req.user,{ message: "You are authorized to access this route" });
+        res.status(200).json({ user: req.user, message: "You are authorized to access this route" });
     } catch (error) {
         console.error("Check Route Error:", error);
         res.status(500).json({ message: "Server Error" });

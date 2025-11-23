@@ -1,106 +1,105 @@
-import { useState } from 'react'
-import { useAuthStore } from '../store/Auth.Store'
-import AuthImagePattern from '../components/AuthImagePattern.jsx'
-import { Mail, MessageSquare, User, EyeOff, Eye, Lock, Loader2 } from 'lucide-react';
-import { Link } from 'react-router-dom'
-import toast from 'react-hot-toast';
+import { useState } from "react";
+import { useAuthStore } from "../store/Auth.Store.js";
+import { Eye, EyeOff, Loader2, Lock, Mail, MessageSquare, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
-function SignupPage() {
-  const [showPassword, setShowPassword] = useState(false)
+import AuthImagePattern from "../components/AuthImagePattern";
+import toast from "react-hot-toast";
+
+const SignUpPage = () => {
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    password: ''
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
   });
 
-  const { isSigningUp, signup } = useAuthStore()
+  const { signup, isSigningUp } = useAuthStore();
 
   const validateForm = () => {
-    if (!formData.firstName) return toast.error("First name is required");
-    if (!formData.email) return toast.error("Email is required or invalid");
-    if (formData.password.length < 4) return toast.error("Password is required and must be at least 4 characters long");
+    if (!formData.firstName.trim()) return toast.error("First name is required");
+    if (!formData.email.trim()) return toast.error("Email is required");
+    if (!/\S+@\S+\.\S+/.test(formData.email)) return toast.error("Invalid email format");
+    if (!formData.password) return toast.error("Password is required");
+    if (formData.password.length < 6) return toast.error("Password must be at least 6 characters");
+
     return true;
-    console.log("Validation successful");
   };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    const sucess = validateForm();
-    if (sucess === true) {
-      signup(formData);
-    }
+    const success = validateForm();
 
-  }
+    if (success === true) signup(formData);
+  };
+
   return (
-    <div className='min-h-screen grid lg:grid-cols-2'>
-      <div className='flex flex-col justify-center items-center p-6 sm:p-12'>
-        <div className="text-center mb-8 bg-[hsl(225,25%,16%)] w-sm p-6 rounded-xl shadow-md">
-          <div className="flex flex-col items-center gap-2 group">
-            <div
-              className="size-12 rounded-xl bg-[hsl(225,27%,20%)] flex items-center justify-center 
-              group-hover:bg-primary/20 transition-colors ]"
-            >
-              <MessageSquare className="size-8 text-[hsl(239,42%,59%)] hover:cursor-pointer " />
+    <div className="min-h-screen grid lg:grid-cols-2 pt-15">
+      <div className="flex flex-col justify-center items-center p-6 sm:p-12">
+        <div className="w-full max-w-md space-y-8">
+          <div className="text-center mb-8">
+            <div className="flex flex-col items-center gap-2 group">
+              <div
+                className="size-12 rounded-xl bg-primary/10 flex items-center justify-center 
+              group-hover:bg-primary/20 transition-colors"
+              >
+                <MessageSquare className="size-6 text-primary" />
+              </div>
+              <h1 className="text-2xl font-bold mt-2">Create Account</h1>
+              <p className="text-base-content/60">Get started with your free account</p>
             </div>
-            <h1 className="text-2xl font-bold mt-2 text-[hsl(214,9%,69%)]">Create Account</h1>
-            <p className="text-base-content/60 text-[hsl(214,9%,69%)]">Get started with your free account</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-
-            {/* first name */}
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium text-[hsl(214,9%,69%)]">First Name</span>
+                <span className="label-text font-medium">First Name</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="size-5 text-base-content/40 text-[hsl(214,9%,69%)]" />
+                  <User className="size-5 text-base-content/40" />
                 </div>
                 <input
                   type="text"
-                  className={`input input-bordered w-full pl-10 border-2 rounded border-[hsl(214,9%,69%)] text-[hsl(214,9%,69%)]`}
-                  placeholder="First name"
+                  className="w-full pl-10 pr-4 py-2 border border-base-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Enter your first name"
                   value={formData.firstName}
                   onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
                 />
               </div>
             </div>
 
-            {/* last name */}
-
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium mt-6 text-[hsl(214,9%,69%)]" >Last Name</span>
+                <span className="label-text font-medium">Last Name</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <User className="size-5 text-base-content/40 text-[hsl(214,9%,69%)]" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <User className="size-5 text-base-content/40" />
                 </div>
                 <input
                   type="text"
-                  className={`input input-bordered w-full pl-10 border-2 rounded border-[hsl(214,9%,69%)] text-[hsl(214,9%,69%)]`}
-                  placeholder="Last Name"
+                  className="w-full pl-10 pr-4 py-2 border border-base-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="Enter your last name"
                   value={formData.lastName}
                   onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
                 />
               </div>
             </div>
 
-            {/* email */}
-
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium text-[hsl(214,9%,69%)]">Email</span>
+                <span className="label-text font-medium">Email</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <Mail className="size-5 text-base-content/40 text-[hsl(214,9%,69%)]" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="size-5 text-base-content/40" />
                 </div>
                 <input
                   type="email"
-                  className={`input input-bordered w-full pl-10 border-2 rounded border-[hsl(214,9%,69%)] text-[hsl(214,9%,69%)]`}
+                  className="w-full pl-10 pr-4 py-2 border border-base-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
@@ -108,29 +107,24 @@ function SignupPage() {
               </div>
             </div>
 
-            {/* password */}
-
             <div className="form-control">
-              
               <label className="label">
-                <span className="label-text font-medium text-[#a9afb7]">Password</span>
+                <span className="label-text font-medium">Password</span>
               </label>
               <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-[hsl(214,9%,69%)]">
-                  <Lock className="size-5 text-base-content/40 text-[hsl(214,9%,69%)]" />
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="size-5 text-base-content/40" />
                 </div>
                 <input
                   type={showPassword ? "text" : "password"}
-                  className={`input input-bordered w-full pl-10 border-2 rounded border-[hsl(214,9%,69%)] text-[hsl(214,9%,69%)]`}
-                  placeholder="••••"
+                  className="w-full pl-10 pr-12 py-2 border border-base-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="••••••••"
                   value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })
-
-                  }
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-[hsl(214,9%,69%)]"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -142,44 +136,36 @@ function SignupPage() {
               </div>
             </div>
 
-
-            <button type="submit" className="btn btn-primary font-medium rounded bg-[hsl(239,42%,59%)] text-[hsl(214,9%,69%)]  hover:bg-[hsl(239,42%,69%)] hover:text-black cursor-pointer w-full" disabled={isSigningUp}>
+            <button type="submit" className="btn btn-primary w-full" disabled={isSigningUp}>
               {isSigningUp ? (
                 <>
-                  <Loader2 className="size-5 animate-spin " />
+                  <Loader2 className="size-5 animate-spin" />
                   Loading...
                 </>
               ) : (
                 "Create Account"
               )}
             </button>
-
           </form>
-          <div className="text-center mt-6">
-            <p className="text-base-content/60 text-[hsl(214,9%,69%)]">
+
+          <div className="text-center">
+            <p className="text-base-content/60">
               Already have an account?{" "}
-              <Link to="/login" className="link link-primary hover:underline text-[hsl(239,42%,59%)] ">
+              <Link to="/login" className="link link-primary">
                 Sign in
               </Link>
             </p>
           </div>
-        </div >
-      </div >
+        </div>
+      </div>
 
       {/* right side */}
-      <div className="hidden lg:flex flex-col justify-center items-center gap-10 bg-gray-800">
-        <AuthImagePattern
-          boxWidth="100px"
-          boxHeight="100px"
-          gap="10px"
-          gridCols={3}
-          borderRadius="rounded-lg"
-        />
-        <h2 className="text-2xl font-bold text-[hsl(214,9%,69%)]">Join our community</h2>
-        <p className="text-base-content/60 text-[hsl(214,9%,69%)]">Connect with friends, share moments, and stay in touch with your loved ones.</p>
-      </div>
+      <AuthImagePattern
+        title="Join our community"
+        subtitle="Connect with friends, share moments, and stay in touch with your loved ones."
+      />
     </div>
-  )
-}
+  );
+};
 
-export default SignupPage
+export default SignUpPage;

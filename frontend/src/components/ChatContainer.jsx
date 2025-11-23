@@ -1,130 +1,92 @@
-import React, { useEffect, useRef } from 'react'
-import { useMessageStore } from '../store/Message.Store'
-import ChatHeader from './ChatHeader.jsx'
-import MessageInput from './MessageInput.jsx'
-import MessageSkeleton from './skeletons/MessageSkeleton.jsx'
-import { useAuthStore } from '../store/Auth.Store.js'
-import { formatMessageTime } from '../lib/utils.js'
+import { useMessageStore } from "../store/Message.Store.js";
+import { useEffect, useRef } from "react";
 
-function ChatContainer() {
-  const { selectedUser, messages, isMessagesLoading, getMessages, subscribeToNewMessages, unsusbscribeToNewMessages } = useMessageStore()
-  const { authUser } = useAuthStore()
-  const messageEndRef = useRef(null)
+import ChatHeader from "./ChatHeader.jsx";
+import MessageInput from "./MessageInput.jsx";
+import MessageSkeleton from "./skeletons/MessageSkeleton.jsx";
+import { useAuthStore } from "../store/Auth.Store.js";
+import { formatMessageTime } from "../lib/utils";
+
+const ChatContainer = () => {
+  const {
+    messages,
+    getMessages,
+    isMessagesLoading,
+    selectedUser,
+    subscribeToNewMessages,
+    unsusbscribeToNewMessages,
+  } = useMessageStore();
+  const { authUser } = useAuthStore();
+  const messageEndRef = useRef(null);
 
   useEffect(() => {
-    getMessages(selectedUser._id)
-    subscribeToNewMessages()
+    getMessages(selectedUser._id);
 
-    return () => unsusbscribeToNewMessages()
+    subscribeToNewMessages();
 
-  }, [selectedUser, getMessages, subscribeToNewMessages, unsusbscribeToNewMessages])
+    return () => unsusbscribeToNewMessages();
+  }, [selectedUser._id, getMessages, subscribeToNewMessages, unsusbscribeToNewMessages]);
 
   useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollTo({
-        top: messageEndRef.current.scrollHeight,
-        behavior: "smooth",
-      });
+    if (messageEndRef.current && messages) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
-  }, [messages, isMessagesLoading]);
+  }, [messages]);
 
   if (isMessagesLoading) {
     return (
-      <div className="flex flex-1 flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-auto">
         <ChatHeader />
-        <div className="flex-1 overflow-auto">
-          <MessageSkeleton />
-        </div>
+        <MessageSkeleton />
         <MessageInput />
       </div>
-    )
+    );
   }
 
   return (
-    <>
-      <style>{`
-        /* Firefox */
-        .custom-scrollbar {
-          scrollbar-width: thin;
-          scrollbar-color: rgba(100,100,100,0.35) transparent;
-        }
+    <div className="flex-1 flex flex-col overflow-auto">
+      <ChatHeader />
 
-        /* WebKit (Chrome, Edge, Safari) */
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 10px;
-          height: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: rgba(100,100,100,0.35);
-          border-radius: 9999px;
-          border: 2px solid transparent;
-          background-clip: padding-box;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background-color: rgba(100,100,100,0.6);
-        }
-
-        /* Dark mode tweaks (DaisyUI / Tailwind dark class on root) */
-        :root.dark .custom-scrollbar::-webkit-scrollbar-thumb,
-        .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: rgba(160,160,160,0.18);
-        }
-        :root.dark .custom-scrollbar {
-          scrollbar-color: rgba(160,160,160,0.18) transparent;
-        }
-      `}</style>
-
-      <div className="flex flex-1 flex-col h-full">
-        <ChatHeader />
-
-        <div
-          ref={messageEndRef}
-          className="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-base-100 custom-scrollbar"
-          aria-live="polite"
-        >
-          {messages.map((message) => {
-            const isOwn = message.senderId.toString() === authUser._id.toString();
-
-            return (
-              <div key={message._id} className={`w-full flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                <div className={`max-w-[80%] flex items-end ${isOwn ? 'flex-row-reverse space-x-reverse space-x-3' : 'space-x-3'}`}>
-                  <div className="shrink-0">
-                    <div className="w-10 h-10 rounded-full overflow-hidden border">
-                      <img
-                        src={
-                          isOwn
-                            ? authUser.profilePic || '/profilePic.jpg'
-                            : selectedUser.profilePic || '/profilePic.jpg'
-                        }
-                        alt="avatar"
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                  </div>
-                  <div className={`${isOwn ? 'bg-primary text-primary-content' : 'bg-base-200 text-base-content'} px-4 py-3 rounded-lg shadow-sm`}>
-                    {message.image && (
-                      <img src={message.image} alt="attachment" className="max-w-full sm:max-w-60 rounded-md mb-2" />
-                    )}
-                    {message.message && <div className="whitespace-pre-wrap">{message.message}</div>}
-                    <div className="text-xs opacity-60 mt-1 text-right">
-                      {formatMessageTime(message.createdAt)}
-                    </div>
-                  </div>
-                </div>
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+          <div
+            key={message._id}
+            className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+            ref={messageEndRef}
+          >
+            <div className=" chat-image avatar">
+              <div className="size-10 rounded-full border">
+                <img
+                  src={
+                    message.senderId === authUser._id
+                      ? authUser.profilePic || "/profilePic.jpg"
+                      : selectedUser.profilePic || "/profilePic.jpg"
+                  }
+                  alt="profile pic"
+                />
               </div>
-            )
-          })}
-        </div>
-
-        <div className="px-4 py-3 border-t border-base-300">
-          <MessageInput />
-        </div>
+            </div>
+            <div className="chat-header mb-1">
+              <time className="text-xs opacity-50 ml-1">
+                {formatMessageTime(message.createdAt)}
+              </time>
+            </div>
+            <div className="chat-bubble flex flex-col">
+              {message.image && (
+                <img
+                  src={message.image}
+                  alt="Attachment"
+                  className="sm:max-w-[200px] rounded-md mb-2"
+                />
+              )}
+              {message.message && <p>{message.message}</p>}
+            </div>
+          </div>
+        ))}
       </div>
-    </>
-  )
-}
 
-export default ChatContainer
+      <MessageInput />
+    </div>
+  );
+};
+export default ChatContainer;

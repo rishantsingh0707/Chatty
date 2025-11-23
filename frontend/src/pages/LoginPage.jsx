@@ -18,21 +18,21 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="h-screen grid lg:grid-cols-2">
+    <div className="h-screen grid lg:grid-cols-2 pt-15">
       {/* Left Side - Form */}
       <div className="flex flex-col justify-center items-center p-6 sm:p-12">
-        <div className=" max-w-md bg-[hsl(225,25%,16%)] w-sm p-6 rounded-xl space-y-8">
+        <div className="w-full max-w-md space-y-8">
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">
               <div
-                className="w-12 h-12 rounded-xl bg-[hsl(225,27%,20%)] flex items-center justify-center group-hover:bg-primary/20
+                className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20
               transition-colors"
               >
-                <MessageSquare className="size-8 text-[hsl(239,42%,59%)] hover:cursor-pointer" />
+                <MessageSquare className="w-6 h-6 text-primary" />
               </div>
-              <h1 className="text-2xl font-bold mt-2 text-[hsl(214,9%,69%)]">Welcome Back</h1>
-              <p className="text-base-content/60 text-[hsl(214,9%,69%)]">Sign in to your account</p>
+              <h1 className="text-2xl font-bold mt-2">Welcome Back</h1>
+              <p className="text-base-content/60">Sign in to your account</p>
             </div>
           </div>
 
@@ -40,40 +40,43 @@ const LoginPage = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium text-[hsl(214,9%,69%)]">Email</span>
+                <span className="label-text font-medium">Email</span>
               </label>
-              <div className="relative border-2 rounded border-[hsl(214,9%,69%)]">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <Mail className="h-5 w-5 text-base-content/40 text-[hsl(214,9%,69%)]" />
+              <div className="relative ">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Mail className="h-5 w-5 text-base-content/40" />
                 </div>
                 <input
                   type="email"
-                  className={`input input-bordered w-full pl-10 text-[hsl(214,9%,69%)]`}
-                  placeholder="you@example.com"
+                  className="w-full pl-10 pr-4 py-2 border border-base-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                  placeholder="youremail@example.com"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 />
+
+
               </div>
             </div>
 
             <div className="form-control">
               <label className="label">
-                <span className="label-text font-medium text-[hsl(214,9%,69%)]">Password</span>
+                <span className="label-text font-medium">Password</span>
               </label>
-              <div className="relative border-2 rounded border-[hsl(214,9%,69%)]">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none ">
-                  <Lock className="h-5 w-5 text-base-content/40 text-[hsl(214,9%,69%)]" />
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-base-content/40" />
                 </div>
+
                 <input
                   type={showPassword ? "text" : "password"}
-                  className={`input input-bordered w-full pl-10 text-[hsl(214,9%,69%)]`}
+                  className={`w-full pl-10 pr-4 py-2 border border-base-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent`}
                   placeholder="••••"
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 />
                 <button
                   type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-[hsl(214,9%,69%)]"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? (
@@ -85,11 +88,11 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <button type="submit" className="btn font-medium btn-primary w-full bg-[hsl(239,42%,59%)] text-[hsl(214,9%,69%)] rounded border-[hsl(239,42%,54%)] hover:bg-[hsl(239,42%,69%)] hover:text-black" disabled={isLoggingIn}>
+            <button type="submit" className="btn btn-primary w-full" disabled={isLoggingIn}>
               {isLoggingIn ? (
                 <>
-                  <Loader2 className="size-4 animate-spin justify-center" />
-                  <span>Loading...</span>
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  Loading...
                 </>
               ) : (
                 "Sign in"
@@ -98,9 +101,9 @@ const LoginPage = () => {
           </form>
 
           <div className="text-center">
-            <p className="text-base-content/60 text-[hsl(214,9%,69%)]">
+            <p className="text-base-content/60">
               Don&apos;t have an account?{" "}
-              <Link to="/signup" className="link link-primary hover:underline text-[hsl(239,42%,59%)] ">
+              <Link to="/signup" className="link link-primary">
                 Create account
               </Link>
             </p>
@@ -109,17 +112,10 @@ const LoginPage = () => {
       </div>
 
       {/* Right Side - Image/Pattern */}
-      <div className="hidden lg:flex flex-col justify-center items-center gap-10 bg-gray-800">
-        <AuthImagePattern
-          boxWidth="100px"
-          boxHeight="100px"
-          gap="10px"
-          gridCols={3}
-          borderRadius="rounded-lg"
-        />
-        <h2 className="text-2xl font-bold text-[hsl(214,9%,69%)]">Join our community</h2>
-        <p className="text-base-content/60 text-[hsl(214,9%,69%)]">Connect with friends, share moments, and stay in touch with your loved ones.</p>
-      </div>
+      <AuthImagePattern
+        title={"Welcome back!"}
+        subtitle={"Sign in to continue your conversations and catch up with your messages."}
+      />
     </div>
   );
 };
