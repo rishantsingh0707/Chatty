@@ -5,21 +5,23 @@ import { useAuthStore } from './Auth.Store.js';
 
 export const useMessageStore = create((set, get) => ({
     friends: [],
-    allUsers: [], // will show ONLY if no friends exist
+    allUsers: [],
     messages: [],
     isMessagesLoading: false,
     isUserloading: false,
     selectedUser: null,
 
+    setSelectedUser: (user) => set({ selectedUser: user }),
+
 
     getUser: async () => {
         set({ isUserloading: true });
         try {
-            // Fetch friends
+           
             const friendsRes = await axiosInstance.get('/users/friends');
             const friends = friendsRes.data.friends;
 
-            // If no friends, load all users instead
+          
             if (friends.length === 0) {
                 const allRes = await axiosInstance.get('/messages/');
                 set({ friends: [], allUsers: allRes.data });
