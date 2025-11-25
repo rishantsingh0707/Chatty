@@ -14,15 +14,12 @@ const App = () => {
   const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
   const { theme } = useThemeStore();
 
-  
   console.log({ theme });
   console.log("Online Users:", { onlineUsers });
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
-  console.log({ authUser });
 
   if (isCheckingAuth && !authUser)
     return (
@@ -32,17 +29,21 @@ const App = () => {
     );
 
   return (
-    <div data-theme={theme} >
+    <div data-theme={theme}>
       <Navbar />
 
       <Routes>
+        {/* Redirect authenticated users to the home page */}
         <Route path="/" element={authUser ? <HomePage /> : <Navigate to="/login" />} />
         <Route path="/signup" element={!authUser ? <SignupPage /> : <Navigate to="/" />} />
         <Route path="/login" element={!authUser ? <LoginPage /> : <Navigate to="/" />} />
         <Route path="/profile" element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+        {/* Catch-all route for undefined paths */}
+        <Route path="*" element={<Navigate to={authUser ? "/" : "/login"} />} />
       </Routes>
       <Toaster />
-    </div >
+    </div>
   );
 };
+
 export default App;

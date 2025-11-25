@@ -4,7 +4,8 @@ import { create } from 'zustand';
 import { useAuthStore } from './Auth.Store.js';
 
 export const useMessageStore = create((set, get) => ({
-    users: [],
+    friends: [],
+    allUsers: [], // will show ONLY if no friends exist
     messages: [],
     isMessagesLoading: false,
     isUserloading: false,
@@ -14,16 +15,25 @@ export const useMessageStore = create((set, get) => ({
     getUser: async () => {
         set({ isUserloading: true });
         try {
-            const res = await axiosInstance.get('/messages/');
-            set({ users: res.data });
+            // Fetch friends
+            const friendsRes = await axiosInstance.get('/users/friends');
+            const friends = friendsRes.data.friends;
+
+            // If no friends, load all users instead
+            if (friends.length === 0) {
+                const allRes = await axiosInstance.get('/messages/');
+                set({ friends: [], allUsers: allRes.data });
+            } else {
+                set({ friends, allUsers: [] });
+            }
         } catch (error) {
-            console.error('Error fetching users for sidebar:', error);
-            toast.error('Could not find users');
-        }
-        finally {
+            console.error('Error fetching users:', error);
+            toast.error('Could not load users');
+        } finally {
             set({ isUserloading: false });
         }
     },
+
 
     getMessages: async (userId) => {
 
@@ -42,7 +52,16 @@ export const useMessageStore = create((set, get) => ({
     },
 
     sendMessage: async (messageData) => {
-        const { messages, selectedUser } = get()
+        const { messages, selectedUser } = get();
+        const authUser = useAuthStore.getState().authUser;
+
+        const isFriend = authUser?.friends?.includes(selectedUser._id);
+        const hasFriends = authUser?.friends?.length > 0;
+
+        if (!isFriend && hasFriends) {
+            toast.error("You can only message your friends");
+            return;
+        }
 
         try {
             const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
@@ -51,8 +70,8 @@ export const useMessageStore = create((set, get) => ({
             toast.error('Error sending message');
             console.error('Error sending message:', error);
         }
-
     },
+
 
     subscribeToNewMessages: () => {
         const { selectedUser } = get();
@@ -71,6 +90,19 @@ export const useMessageStore = create((set, get) => ({
         socket.off('new-message');
     },
 
-    setSelectedUser: async (user) => set({ selectedUser: user }),
+    setSelectedUserSecure: (user) => {
+        const authUser = useAuthStore.getState().authUser;
+
+        const isFriend = authUser?.friends?.includes(user._id);
+        const hasFriends = authUser?.friends?.length > 0;
+
+        if (!isFriend && hasFriends) {
+            toast.error("You can only chat with friends");
+            return;
+        }
+
+        set({ selectedUser: user });
+    },
+
 
 }));

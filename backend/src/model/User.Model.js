@@ -1,4 +1,4 @@
-import mongoose ,{ Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
 const userSchema = new Schema({
     email: {
@@ -22,8 +22,18 @@ const userSchema = new Schema({
     profilePic: {
         type: String,
         default: '',
-    }
-}, {timestamps: true});
+    },
+    friends: [
+        { type: mongoose.Schema.Types.ObjectId, ref: "User" }
+    ],
+    uniqueCode: {
+        type: String,
+        unique: true,
+        required: true
+    },
+    friends: [{ type: mongoose.Schema.Types.ObjectId, ref: "User" }]
+
+}, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
 export default User;

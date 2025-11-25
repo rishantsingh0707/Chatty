@@ -6,7 +6,7 @@ import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
     try {
-        const { email, firstName, lastName, password, profilePic } = req.body;
+        const { email, firstName, lastName, password } = req.body;
         console.log(req.body);
 
         if (!email || !firstName || !password) {
@@ -16,10 +16,15 @@ export const signup = async (req, res) => {
         const user = await User.findOne({ email });
         if (user) return res.status(400).json({ message: "User already exists" });
 
-        let uploadedImageUrl = "";
-        if (profilePic) {
-            const uploadResult = await cloudinary.uploader.upload(profilePic);
-            uploadedImageUrl = uploadResult.secure_url;
+        function generateUniqueCode() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+
+        let code;
+        while (true) {
+            code = generateUniqueCode();
+            const exists = await User.findOne({ uniqueCode: code });
+            if (!exists) break;
         }
 
         const salt = await bcrypt.genSalt(10);
@@ -29,19 +34,21 @@ export const signup = async (req, res) => {
             firstName,
             lastName,
             password: hashedPassword,
-            profilePic: uploadedImageUrl
+            uniqueCode: code
         });
 
         if (newUser) {
             generateToken(newUser._id, res)
             await newUser.save();
             res.status(201).json({
-                _id: newUser._id,
-                email: newUser.email,
-                firstName: newUser.firstName,
-                lastName: newUser.lastName,
-                profilePic: newUser.profilePic,
-                password: newUser.password,
+                user: {
+                    _id: newUser._id,
+                    email: newUser.email,
+                    firstName: newUser.firstName,
+                    lastName: newUser.lastName,
+                    uniqueCode: newUser.uniqueCode
+                }
+                ,
                 message: "User created successfully"
             });
         }
@@ -76,11 +83,9 @@ export const login = async (req, res) => {
                     email: user.email,
                     firstName: user.firstName,
                     lastName: user.lastName,
-                    profilePic: user.profilePic,
-                    password: user.password
+                    uniqueCode: user.uniqueCode
                 },
-
-                message: "Login successful"
+                message: "Login successful",
             });
             console.log("Login successful for user:", user);
         }
@@ -88,7 +93,6 @@ export const login = async (req, res) => {
         res.status(500).json({ message: "Error in login" });
     }
 };
-
 export const logout = async (req, res) => {
     try {
         res.cookie('jwt', '', { maxAge: 0 });
@@ -111,7 +115,6 @@ export const updateProfile = async (req, res) => {
 
         let uploadedImage;
 
-        // If a new profilePic is sent
         if (profilePic) {
             uploadedImage = await cloudinary.uploader.upload(profilePic, {
                 public_id: user.profilePicPublicId || `profile_${userId}`,
@@ -149,3 +152,29 @@ export const checkRoute = async (req, res) => {
         res.status(500).json({ message: "Server Error" });
     }
 }
+
+export const searchByCode = async (req, res) => {
+    try {
+        const { code } = req.params;
+
+        if (!code || code.length !== 6) {
+            return res.status(400).json({ message: "Invalid code format" });
+        }
+
+        const user = await User.findOne({ uniqueCode: code }).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ message: "No user found with this code" });
+        }
+
+        return res.json({
+            message: "User found",
+            user,
+        });
+
+    } catch (error) {
+        console.error("Search user by code error:", error);
+        res.status(500).json({ message: "Server error" });
+    }
+};
+

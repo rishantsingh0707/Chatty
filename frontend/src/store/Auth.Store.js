@@ -17,8 +17,15 @@ export const useAuthStore = create((set, get) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");
+      const friends = await get().fetchFriends();
 
-      set({ authUser: res.data.user });
+      set({
+        authUser: {
+          ...res.data.user,
+          friends,
+        },
+      });
+
       get().connectSocket();
     } catch (error) {
       console.log("Error in checkAuth:", error);
@@ -32,7 +39,14 @@ export const useAuthStore = create((set, get) => ({
     set({ isSigningUp: true });
     try {
       const res = await axiosInstance.post("/auth/signup", data);
-      set({ authUser: res.data.user });
+      const friends = [];
+
+      set({
+        authUser: {
+          ...res.data.user,
+          friends,
+        },
+      });
       toast.success("Account created successfully");
       get().connectSocket();
     } catch (error) {
@@ -46,7 +60,14 @@ export const useAuthStore = create((set, get) => ({
     set({ isLoggingIn: true });
     try {
       const res = await axiosInstance.post("/auth/login", data);
-      set({ authUser: res.data.user });
+      const friends = await get().fetchFriends();
+
+      set({
+        authUser: {
+          ...res.data.user,
+          friends,
+        },
+      });
       toast.success("Logged in successfully");
 
       get().connectSocket();
@@ -72,7 +93,14 @@ export const useAuthStore = create((set, get) => ({
     set({ isUpdatingProfile: true });
     try {
       const res = await axiosInstance.put("/auth/update-profile", data);
-      set({ authUser: res.data });
+      const friends = await get().fetchFriends();
+
+      set({
+        authUser: {
+          ...res.data.user,
+          friends,
+        },
+      });
       toast.success("Profile updated successfully");
     } catch (error) {
       console.log("error in update profile:", error);
@@ -99,7 +127,50 @@ export const useAuthStore = create((set, get) => ({
       set({ onlineUsers: userIds });
     });
   },
+
+
   disconnectSocket: () => {
     if (get().socket?.connected) get().socket.disconnect();
   },
-}));
+
+  fetchFriends: async () => {
+    try {
+      const res = await axiosInstance.get("/users/friends");
+
+      return res.data.friends.map(f => f._id);
+    } catch (error) {
+      console.error("Error fetching friends:", error);
+      return [];
+    }
+  },
+
+  addFriend: async (friendId) => {
+    const { authUser } = get();
+    try {
+      if (authUser.friends.includes(friendId)) {
+        toast.error("User is already your friend");
+        return;
+      }
+      await axiosInstance.post(`/users/add-friend/${friendId}`);
+    } catch (error) {
+      console.error("Error adding friend:", error);
+      toast.error(error.response?.data?.message || "Failed to add friend");
+    }
+  },
+
+  removeFriend: async (friendId) => {
+    const { authUser } = get();
+    try {
+      if (!authUser.friends.includes(friendId)) {
+        toast.error("User is not your friend");
+        return;
+      }
+      await axiosInstance.post(`/users/remove-friend/${friendId}`);
+      return toast.success("Friend removed successfully");
+    } catch (error) {
+      console.error("Error removing friend:", error);
+      toast.error(error.response?.data?.message || "Failed to remove friend");
+    }
+  },
+})
+);

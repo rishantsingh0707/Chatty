@@ -1,11 +1,11 @@
-import {  useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useMessageStore } from "../store/Message.Store.js";
 import { useAuthStore } from "../store/Auth.Store.js";
 import SidebarSkeleton from "./skeletons/SidebarSkeletons.jsx";
 import { Users } from "lucide-react";
 
 const Sidebar = () => {
-  const { getUser, users, selectedUser, setSelectedUser, isUsersLoading } = useMessageStore();
+  const { getUser, friends, allUsers, selectedUser, setSelectedUserSecure, isUserloading } = useMessageStore();
 
   const { onlineUsers } = useAuthStore();
   const [showOnlineOnly, setShowOnlineOnly] = useState(false);
@@ -14,11 +14,15 @@ const Sidebar = () => {
     getUser();
   }, [getUser, onlineUsers]);
 
-  const filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user._id))
-    : users;
+  const listToShow = friends.length > 0 ? friends : allUsers;
 
-  if (isUsersLoading) return <SidebarSkeleton />;
+  const filteredUsers = showOnlineOnly
+    ? listToShow.filter((u) => onlineUsers.includes(u._id))
+    : listToShow;
+
+
+
+  if (isUserloading) return <SidebarSkeleton />;
 
   return (
     <aside className="h-full w-20 lg:w-72 border-r border-base-300 flex flex-col transition-all duration-200">
@@ -38,7 +42,7 @@ const Sidebar = () => {
             />
             <span className="text-sm">Show online only</span>
           </label>
-          <span className="text-xs text-zinc-500">({onlineUsers.length-1 } online)</span>
+          <span className="text-xs text-zinc-500">({onlineUsers.length - 1} online)</span>
         </div>
       </div>
 
@@ -46,7 +50,7 @@ const Sidebar = () => {
         {filteredUsers.map((user) => (
           <button
             key={user._id}
-            onClick={() => setSelectedUser(user)}
+            onClick={() => setSelectedUserSecure(user)}
             className={`
               w-full p-3 flex items-center gap-3
               hover:bg-base-300 transition-colors
