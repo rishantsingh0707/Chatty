@@ -56,54 +56,7 @@ const Navbar = () => {
             <h1 className="text-lg font-bold">Chatty</h1>
           </Link>
 
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="hidden md:flex items-center w-[300px] lg:w-[380px] relative">
-            <div className="relative w-full">
-              <input
-                type="text"
-                maxLength={6}
-                value={code}
-                onChange={(e) => setCode(e.target.value)}
-                placeholder="Enter 6-digit friend code"
-                className="input input-bordered w-full pl-10 h-10"
-              />
-              <Search className="absolute left-3 top-2.5 w-5 h-5 text-base-content/60" />
-            </div>
 
-            {/* Result Popup */}
-            {result && (
-              <div className="absolute top-12 bg-base-200 shadow-xl p-4 rounded-lg w-full border border-base-300">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={result.profilePic || "/profilePic.jpg"}
-                    className="w-10 h-10 rounded-full"
-                  />
-                  <div>
-                    <p className="font-semibold">
-                      {result.firstName} {result.lastName}
-                    </p>
-                    <p className="text-xs opacity-70">
-                      Code: {result.uniqueCode}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-3 flex justify-end">
-                  {isFriend ? (
-                    <button onClick={handleRemove} className="btn btn-error btn-sm">
-                      Remove
-                    </button>
-                  ) : (
-                    <button onClick={handleAdd} className="btn btn-primary btn-sm">
-                      Add
-                    </button>
-                  )}
-                </div>
-              </div>
-            )}
-          </form>
-
-          {/* Right Side */}
           <div className="flex items-center gap-2">
 
             <button className="btn btn-sm" onClick={toggleTheme}>
@@ -112,6 +65,52 @@ const Navbar = () => {
 
             {authUser && (
               <>
+                <form onSubmit={handleSearch} className="hidden md:flex items-center w-[300px] lg:w-[380px] relative">
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      maxLength={6}
+                      value={code}
+                      onChange={(e) => setCode(e.target.value)}
+                      placeholder="Enter 6-digit friend code"
+                      className="input input-bordered w-full pl-10 h-10"
+                    />
+                    <Search className="absolute left-3 top-2.5 w-5 h-5 text-base-content/60" />
+                  </div>
+
+                  {/* Result Popup */}
+                  {result && (
+                    <div className="absolute top-12 bg-base-200 shadow-xl p-4 rounded-lg w-full border border-base-300">
+                      <div className="flex items-center gap-3">
+                        <img
+                          src={result.profilePic || "/profilePic.jpg"}
+                          className="w-10 h-10 rounded-full"
+                        />
+                        <div>
+                          <p className="font-semibold">
+                            {result.firstName} {result.lastName}
+                          </p>
+                          <p className="text-xs opacity-70">
+                            Code: {result.uniqueCode}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="mt-3 flex justify-end">
+                        {isFriend ? (
+                          <button onClick={handleRemove} className="btn btn-error btn-sm">
+                            Remove
+                          </button>
+                        ) : (
+                          <button onClick={handleAdd} className="btn btn-primary btn-sm">
+                            Add
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </form>
+                
                 <Link to="/profile" className="btn btn-sm gap-2">
                   <User className="w-4 h-4" />
                   <span className="hidden sm:inline">Profile</span>
