@@ -26,16 +26,6 @@ app.use('/auth', authRoutes);
 app.use('/messages', messageRoutes);
 app.use('/users', userRoutes);     
 
-if (process.env.NODE_ENV === 'production') {
-    // serve static files from frontend build
-    app.use(express.static(path.join(__dirname, '..', 'frontend', 'dist')));
-
-    // catch-all — use regex instead of "*" to avoid path-to-regexp error
-    app.get(/(.*)/, (req, res) => {
-        res.sendFile(path.join(__dirname, '..', 'frontend', 'dist', 'index.html'));
-    });
-}
-
 
 server.listen(PORT, () => {
     connectDB();
