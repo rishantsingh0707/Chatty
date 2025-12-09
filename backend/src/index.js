@@ -11,20 +11,23 @@ import cors from 'cors';
 import { io, server, app } from './lib/socket.js';
 import path from 'path';
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT;
 const __dirname = path.resolve();
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: [
+        "http://localhost:5173",
+        process.env.CLIENT_URL
+    ],
     credentials: true,
 }));
 
 app.use('/auth', authRoutes);
 app.use('/messages', messageRoutes);
-app.use('/users', userRoutes);     
+app.use('/users', userRoutes);
 
 
 server.listen(PORT, () => {
