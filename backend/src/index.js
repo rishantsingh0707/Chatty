@@ -8,7 +8,7 @@ import userRoutes from './routes/user.route.js';
 
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
-import { io, server, app } from './lib/socket.js';
+import {  server, app } from './lib/socket.js';
 import path from 'path';
 
 const PORT = process.env.PORT;
