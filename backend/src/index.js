@@ -13,28 +13,16 @@ import path from 'path';
 
 const PORT = process.env.PORT;
 const __dirname = path.resolve();
+app.use(
+    cors({
+        origin: true,        // reflect request origin automatically
+        credentials: true,
+    })
+);
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(cookieParser());
-
-app.use(cors({
-    origin: (origin, callback) => {
-        if (!origin) return callback(null, true); // Postman / server calls
-
-        if (
-            origin.startsWith("http://localhost:") ||
-            origin.endsWith(".vercel.app")
-        ) {
-            return callback(null, true);
-        }
-
-        return callback(new Error("Not allowed by CORS"));
-    },
-    credentials: true,
-}));
-
-app.options(/.*/, cors());
-
 
 app.use('/auth', authRoutes);
 app.use('/messages', messageRoutes);
