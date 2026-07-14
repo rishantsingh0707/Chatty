@@ -28,7 +28,6 @@ app.use('/auth', authRoutes);
 app.use('/messages', messageRoutes);
 app.use('/users', userRoutes);
 
-
 server.listen(PORT, () => {
     connectDB();
     console.log(`Server is running on http://localhost:${PORT}`);

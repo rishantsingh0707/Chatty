@@ -94,6 +94,7 @@ export const login = async (req, res) => {
         console.error("Login Error:", error);
     }
 };
+
 export const logout = async (req, res) => {
     try {
         res.cookie('jwt', '', { maxAge: 0 });
